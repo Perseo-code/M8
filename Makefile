@@ -18,10 +18,12 @@ all: $(BIN)
 
 install: all
 	mv $(BIN) /usr/bin/$(NAME)
+
 install-no-sudo:
- mkdir ~/.masm
- mv $(BIN) ~/.masm/$(NAME)
- echo "\n alias masm='~/.masm/masm'" >> .bashrc
+	mkdir ~/.masm
+	mv $(BIN) ~/.masm/$(NAME)
+	echo "\n alias masm='~/.masm/masm'" >> .bashrc
+
 clean:
 	rm -rf $(BUILD_DIR)
 	rm -f $(BIN)
