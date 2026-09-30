@@ -42,3 +42,8 @@ Expects direxpects[] = {
     DEFEXP(_EQU, NUMBER, NOTHING), // later expect labels.
     DEFEXP(_ORG, NUMBER, NOTHING)
 };
+
+void handleDirective(ParsedIns ins, Assembler* assm, Encoded* encoded) {
+    ins.directive.fn(assm, &ins);
+    // TODO: finish this function so directives work
+}

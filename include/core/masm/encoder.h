@@ -3,7 +3,7 @@
 #include <stdint.h>
 #include "parser.h"
 #include "structures.h"
-
+#include "directives.h"
 
 Encoded encoder(ParsedIns);
 

@@ -66,7 +66,7 @@ typedef enum ParsingError {
 } ParsingError;
 
 typedef struct {
-    uint8_t data[MAX_INS_SIZE];
+    uint8_t* data;
     uint8_t size;
 } Encoded;
 #endif
