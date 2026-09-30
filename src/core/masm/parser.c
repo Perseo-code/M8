@@ -1,6 +1,7 @@
 #include "parser.h"
 #include <stdlib.h>
 #include <stdio.h>
+
 uint64_t parser_position = 0;
 
 ParsedIns parse(ParsingError* error) {
@@ -73,9 +74,10 @@ ParsedIns parse(ParsingError* error) {
 
                 result.ptype = DIRECT;
                 bool b = true;
+                Directive d;
                 for (int j = 0; j < DIR_SIZE; j++) {
-                    if (STREQ(list[parser_position].literal, directives[j])) {
-                        result.directive = j;
+                    if (STREQ(list[parser_position].literal, dirnames[j].name)) {
+                        d = directives[dirnames[j].code];
                         b = false;
                         break;
                     }
@@ -85,7 +87,7 @@ ParsedIns parse(ParsingError* error) {
                     return (ParsedIns){};
                 }
                 
-                
+                result.directive = d;
                 break;
             case NUMBER:
                 if (result.ptype != INSTRUCT) {

@@ -16,6 +16,8 @@ typedef enum Register {
     REND
 } Register;
 
+extern char* regss[];
+
 typedef struct {
     uint8_t r[REND];
 } Registers;

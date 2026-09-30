@@ -5,7 +5,7 @@
 #include "cpu.h"
 #define CALCSIZE(array) (sizeof(array) / sizeof((array)[0]))
 #define GETBITS(byte, bits, mask) ((byte >> bits) & mask) // If we need
-#define CREATEOP(fn, byte, size) [byte] = {false, byte, size, fn} 
+
 // Each instruction value
 #define _NOP 0x00
 #define _MOV 0x01
@@ -24,6 +24,7 @@ typedef struct GivenCommands GivenCommands;
 typedef void (*Instruction)(CPU* cpu, GivenCommands);
 typedef struct {
     bool empty;
+    bool valid;
     uint8_t code;
     uint8_t size;
     Instruction ins;

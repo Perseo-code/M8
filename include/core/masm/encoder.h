@@ -2,11 +2,8 @@
 #define ENCODER_H
 #include <stdint.h>
 #include "parser.h"
-#define MAX_INS_SIZE 16
-typedef struct {
-    uint8_t data[MAX_INS_SIZE];
-    uint8_t size;
-} Encoded;
+#include "structures.h"
+
 
 Encoded encoder(ParsedIns);
 

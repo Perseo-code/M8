@@ -1,5 +1,7 @@
 #include "operations.h"
 #include <stdio.h>
+#define CREATEOP(fn, byte, size) [byte] = {false, true, byte, size, fn} 
+
 void nop(CPU* cpu, GivenCommands cmd) {}
 void mov(CPU* cpu, GivenCommands cmd) {
     uint8_t value = cmd.operand2;
@@ -28,7 +30,7 @@ void showreg(CPU* cpu, GivenCommands cmd) {
     printf("%d \n", reg);
 }
 
-Operation OPS[INS_SET_SIZE] = {
+Operation OPS[INS_SET_SIZE] = { 
     CREATEOP(nop, _NOP, 1),
     CREATEOP(mov, _MOV, 3),
     CREATEOP(add, _ADD, 3),

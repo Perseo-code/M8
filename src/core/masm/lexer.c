@@ -8,24 +8,7 @@
 
 Token list[2048];
 
-char* regss[REND] = {
-    "ar",
-    "br",
-    "cr",
-    "rr",
-    "l1",
-    "l2",
-    "l3",
-    "l4",
-    "l5",
-    "l6",
-    "l7"
-};
 
-char* directives[DIR_SIZE] = {
-    "db", "equ", ".bss",
-    ".data", ".rodata"
-}; 
 
 Token* current_token;
 uint32_t token_count;
@@ -66,7 +49,7 @@ TokenType identify(const char* data) {
     }
 
     for (int i = 0; i < DIR_SIZE; i++) {
-        if (STREQ(data, directives[i])) {
+        if (STREQ(data, dirnames[i].name)) {
             return DIRECTIVE;
         }
     }
