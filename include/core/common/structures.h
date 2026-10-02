@@ -9,6 +9,7 @@
 typedef enum TokenType {
     INSTRUCTION,
     REGISTER, // Registers (AR, BR, CR, RR, L7...)
+    IDENTIFIER, // For already created labels
     LABEL, // label: code...
     DIRECTIVE, // db, dw, equ, .bss, .data, .rodata...
     NUMBER, // A Number
@@ -33,7 +34,8 @@ typedef struct Directive {
 typedef enum ParseType {
     NON,
     DIRECT,
-    INSTRUCT
+    INSTRUCT,
+    LAB
 } ParseType;
 
 typedef struct {
@@ -41,12 +43,21 @@ typedef struct {
     uint8_t value;
 } Operand;
 
+typedef struct Label {
+    char* name;
+    size_t name_size;
+    uintptr_t address;
+} Label;
+
 typedef struct ParsedIns {
-    Operation op;
     Operand ope1;
     Operand ope2;
     ParseType ptype;
-    Directive directive;
+    union {
+        Operation* op;
+        Directive* directive;
+        Label* label;
+    } data;
 } ParsedIns;
 
 typedef enum ParsingError {
@@ -54,6 +65,7 @@ typedef enum ParsingError {
     UNKNOWN_INSTRUCTION,
     UNKNOWN_DIRECTIVE,
     UNKNOWN_REGISTER,
+    UNKNOWN_IDENTIFIER,
     SYNTAX_ERROR,
     INVALID_OPCODE,
     INVALID_ARGUMENT,
@@ -62,11 +74,26 @@ typedef enum ParsingError {
     MISSING_ARGUMENT,
     MISSING_LINE,
     OUT_OF_BOUNDS,
-    TOO_MANY_OPERANDS
+    TOO_MANY_OPERANDS,
+    LABEL_HAS_NO_NAME,
+    OUT_OF_MEMORY
 } ParsingError;
 
 typedef struct {
     uint8_t* data;
     uint8_t size;
 } Encoded;
+
+inline void appendToEncodedBuffer(Encoded* enc, uint8_t newData, bool *err) {
+    uint8_t* temp = realloc(enc->data, enc->size++);
+    *err = false;
+    if (temp == NULL) {
+        *err = true;
+        free(temp);
+        return;
+    }
+    
+    enc->data = temp;
+    enc->data[enc->size] = newData;
+}
 #endif

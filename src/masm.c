@@ -82,7 +82,7 @@ int compiler(char* buffer, FILE* output) {
     //        i,
     //        list[i].type,
     //        list[i].literal);
-    
+    Assembler* assm = init_assembler();
     while (parser_position < token_count) {
         ParsingError error;
 
@@ -93,7 +93,7 @@ int compiler(char* buffer, FILE* output) {
 
         if (parsed.ptype == NON)
             break;
-        Encoded encoded = encoder(parsed);
+        Encoded encoded = encoder(parsed, assm);
 
         fwrite(encoded.data, 1, encoded.size, output);
     }

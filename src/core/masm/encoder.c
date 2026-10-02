@@ -1,12 +1,14 @@
 #include "encoder.h"
 
-Encoded encoder(ParsedIns ins) {
+Encoded encoder(ParsedIns ins, Assembler* assm) {
     Encoded result;
     result.data = malloc(sizeof(uint8_t));
     if (ins.ptype == DIRECT) {
-        result.data[0] = ins.directive.code;
+        handleDirective(ins, assm, &result);
+    } else if (ins.ptype == LAB) {
+        
     } else {
-        result.data[0] = ins.op.code;
+        result.data[0] = ins.data.op->code;
     }
     result.size = 1;
     
@@ -31,15 +33,3 @@ Encoded encoder(ParsedIns ins) {
     return result;
 }
 
-void appendToEncodedBuffer(Encoded* enc, uint8_t newData, bool *err) {
-    uint8_t* temp = realloc(enc->data, enc->size++);
-    *err = false;
-    if (temp == NULL) {
-        *err = true;
-        free(temp);
-        return;
-    }
-    
-    enc->data = temp;
-    enc->data[enc->size] = newData;
-}

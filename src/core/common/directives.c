@@ -3,19 +3,51 @@
 #define DEFDIR(b, fn) [b] = {fn, b}
 #define DEFNAME(b, n) {n, b}
 #define DEFEXP(b, e, e2) [b] = {e, e2}
+void allocateNew(Assembler* assm) {
+    uint8_t* temp = realloc(assm->output, sizeof(uint8_t) * assm->output_size);
+    if (temp == NULL) {
+        free(temp);
+        return;
+    }
+
+    assm->output = temp;
+}
 void dataHeader(Assembler* assm, ParsedIns* p) {assm->sect = DATA;}
 void bssHeader(Assembler* assm, ParsedIns* p) {assm->sect = BSS;}
 void textHeader(Assembler* assm, ParsedIns* p) {assm->sect = TEXT;}
 void defbyte(Assembler* assm, ParsedIns* p) {
-    assm->output[assm->position++] = 0;
+    assm->output[assm->position++] = p->ope1.value;
+    assm->output_size++;
 }
 void equ(Assembler* assm, ParsedIns* p) {
     assm->output[assm->position++] = p->ope1.value;
+    assm->output_size++;
 }
 void org(Assembler* assm, ParsedIns* p) {
+    if (assm->output + p->ope1.value == NULL) {
+        uint8_t* temp = realloc(assm->output, sizeof(uint8_t) * p->ope1.value);
+        if (temp == NULL) {
+            free(temp);
+            return;
+        }
+
+        assm->output = temp;
+        assm->output_size = p->ope1.value;
+        assm->position = p->ope1.value;
+        allocateNew(assm);
+    }
     assm->position = p->ope1.value;
 }
 
+void resb(Assembler* assm, ParsedIns* p) {
+    int i = 0;
+    for (; i < p->ope1.value; i++) {
+        assm->output[assm->position + i] = 0;
+    }
+    assm->position += i;
+    assm->output_size += i;
+    allocateNew(assm);
+}
 Directive directives[] = {
     DEFDIR(_DATA, dataHeader),
     DEFDIR(_BSS, bssHeader),
@@ -44,6 +76,11 @@ Expects direxpects[] = {
 };
 
 void handleDirective(ParsedIns ins, Assembler* assm, Encoded* encoded) {
-    ins.directive.fn(assm, &ins);
-    // TODO: finish this function so directives work
+    ins.data.directive->fn(assm, &ins);
+    for (int i = 0; i < assm->output_size; i++) {
+        bool err = false;
+        appendToEncodedBuffer(encoded, assm->output[i], &err);
+        if (err)
+            return;
+    }
 }

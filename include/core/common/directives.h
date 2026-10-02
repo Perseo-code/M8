@@ -17,4 +17,6 @@ typedef struct DirName {
 
 extern Directive directives[];
 extern DirName dirnames[];
+
+void handleDirective(ParsedIns, Assembler*, Encoded*);
 #endif

@@ -5,6 +5,6 @@
 #include "structures.h"
 #include "directives.h"
 
-Encoded encoder(ParsedIns);
+Encoded encoder(ParsedIns, Assembler*);
 
 #endif

@@ -3,10 +3,10 @@
 #include <stdio.h>
 
 uint64_t parser_position = 0;
-
+Label* all_labels;
+size_t amount_labels = 1;
 ParsedIns parse(ParsingError* error) {
     ParsedIns result = {
-        .op.empty = true,
         .ope1.type = NONE,
         .ope2.type = NONE,
         .ptype = NON
@@ -21,6 +21,7 @@ ParsedIns parse(ParsingError* error) {
                     *error = TOO_MANY_OPERANDS;
                     return (ParsedIns){};
                 }
+                result.data.op = malloc(sizeof(Operation));
                 result.ptype = INSTRUCT;
                 OpName op;
                 //printf("INSTRUCTION: %s, ptype=%d\n",
@@ -38,7 +39,7 @@ ParsedIns parse(ParsingError* error) {
                     *error = UNKNOWN_INSTRUCTION;
                     return (ParsedIns){};
                 } // No such instruction...
-                result.op = OPS[op.inst];
+                *result.data.op = OPS[op.inst];
                 break;
             case REGISTER:
                 //printf("REGISTER: %s, ope1=%d, ope2=%d\n",
@@ -71,7 +72,7 @@ ParsedIns parse(ParsingError* error) {
                     *error = TOO_MANY_OPERANDS;
                     return (ParsedIns){};
                 }
-
+                result.data.directive = malloc(sizeof(Directive));
                 result.ptype = DIRECT;
                 bool b = true;
                 Directive d;
@@ -87,8 +88,48 @@ ParsedIns parse(ParsingError* error) {
                     return (ParsedIns){};
                 }
                 
-                result.directive = d;
+                result.data.directive = &d;
                 break;
+            case LABEL:
+                if (result.ptype != NON) {
+                    *error = TOO_MANY_OPERANDS;
+                    return (ParsedIns){};
+                }
+
+                result.data.label = malloc(sizeof(Label));
+                result.ptype = LAB;
+                strcpy(result.data.label->name, list[parser_position].literal);
+                result.data.label->name_size = strlen(result.data.label->name);
+                if (result.data.label->name_size == 0) {
+                    *error = LABEL_HAS_NO_NAME;
+                    return (ParsedIns){};
+                }
+                Label* temp = realloc(all_labels, amount_labels);
+                if (temp == NULL) {
+                    *error = OUT_OF_MEMORY;
+                    free(temp);
+                    return (ParsedIns){};
+                }
+                all_labels = temp;
+                amount_labels++;
+                break;
+            case IDENTIFIER:
+                if (result.ptype != NON) {
+                    *error = TOO_MANY_OPERANDS;
+                    return (ParsedIns){};
+                }
+
+                result.ptype = LAB;
+                for (size_t i = 0; i < amount_labels; i++) {
+                    if (STREQ(list[parser_position].literal, all_labels[i].name)) {
+                        *result.data.label = all_labels[i];
+                        return result;
+                    }
+                }
+                
+                *error = UNKNOWN_IDENTIFIER;
+                return (ParsedIns){};
+
             case NUMBER:
                 if (result.ptype != INSTRUCT) {
                     *error = INVALID_ARGUMENT;
@@ -122,7 +163,7 @@ ParsedIns parse(ParsingError* error) {
                     case DIRECT:
                         break;
                     case INSTRUCT:
-                        if (result.op.empty) {*error = MISSING_INSTRUCTION; return (ParsedIns){};}
+                        if (result.data.op->empty) {*error = MISSING_INSTRUCTION; return (ParsedIns){};}
                         Args args1 = NOTHING;
                         Args args2 = NOTHING;
                         switch (result.ope1.type) {
@@ -133,7 +174,7 @@ ParsedIns parse(ParsingError* error) {
                                 args1 = NUM;
                                 break;
                         }
-                        if (!(ins_expect[result.op.code].arg1 == args1)) {
+                        if (!(ins_expect[result.data.op->code].arg1 == args1)) {
                             *error = INVALID_ARGUMENT;
                             return (ParsedIns){};
                         }
@@ -147,7 +188,7 @@ ParsedIns parse(ParsingError* error) {
                                 break;
                         }
 
-                        if (!(ins_expect[result.op.code].arg2 == args2)) {
+                        if (!(ins_expect[result.data.op->code].arg2 == args2)) {
                             *error = INVALID_ARGUMENT;
                             return (ParsedIns){};
                         }

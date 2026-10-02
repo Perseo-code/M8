@@ -30,6 +30,15 @@ bool is_number(const char* data) {
     return true;
 }
 
+bool is_label_definition(const char* data) {
+    int len = strlen(data);
+    if (len == 0) return false;
+    int i = 0;
+    if (data[len - 1] == ':')
+        return true;
+    return false;
+}
+
 TokenType identify(const char* data) {
     for (int i = 0; i < OPNAME_SIZE; i++) {
         if (STREQ(data, opname[i].name)) {
@@ -53,8 +62,9 @@ TokenType identify(const char* data) {
             return DIRECTIVE;
         }
     }
-
     if (is_number(data)) return NUMBER;
+    if (is_label_definition(data)) return LABEL;
+    if (strlen(data) != 0) return IDENTIFIER;
     return NONE;
 }
 
