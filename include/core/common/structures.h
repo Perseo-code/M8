@@ -4,6 +4,7 @@
 #define MAX_DATA_SIZE 8
 #define MAX_TOKEN_SIZE 16
 #include <stdint.h>
+#include <stdbool.h>
 #include "operations.h"
 #include "assembler.h"
 typedef enum TokenType {
@@ -35,19 +36,24 @@ typedef enum ParseType {
     NON,
     DIRECT,
     INSTRUCT,
-    LAB
+    LAB,
+    ID
 } ParseType;
-
-typedef struct {
-    TokenType type;
-    uint8_t value;
-} Operand;
 
 typedef struct Label {
     char* name;
     size_t name_size;
-    uintptr_t address;
+    uint16_t address;
+    uintptr_t index;
 } Label;
+
+typedef struct {
+    TokenType type;
+    union {
+        uint8_t value;
+        Label* label;
+    } val;
+} Operand;
 
 typedef struct ParsedIns {
     Operand ope1;
@@ -60,6 +66,8 @@ typedef struct ParsedIns {
     } data;
 } ParsedIns;
 
+extern Label* all_labels;
+extern size_t amount_labels;
 typedef enum ParsingError {
     OKAY,
     UNKNOWN_INSTRUCTION,
@@ -96,4 +104,4 @@ inline void appendToEncodedBuffer(Encoded* enc, uint8_t newData, bool *err) {
     enc->data = temp;
     enc->data[enc->size] = newData;
 }
-#endif
+#endif 

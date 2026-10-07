@@ -94,7 +94,6 @@ int compiler(char* buffer, FILE* output) {
         if (parsed.ptype == NON)
             break;
         Encoded encoded = encoder(parsed, assm);
-
         fwrite(encoded.data, 1, encoded.size, output);
     }
     fclose(output);

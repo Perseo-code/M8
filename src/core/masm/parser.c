@@ -112,6 +112,7 @@ ParsedIns parse(ParsingError* error) {
                 }
                 all_labels = temp;
                 amount_labels++;
+                all_labels->index = amount_labels;
                 break;
             case IDENTIFIER:
                 if (result.ptype != NON) {
@@ -119,9 +120,9 @@ ParsedIns parse(ParsingError* error) {
                     return (ParsedIns){};
                 }
 
-                result.ptype = LAB;
                 for (size_t i = 0; i < amount_labels; i++) {
                     if (STREQ(list[parser_position].literal, all_labels[i].name)) {
+                        result.ptype = LAB;
                         *result.data.label = all_labels[i];
                         return result;
                     }
@@ -132,7 +133,7 @@ ParsedIns parse(ParsingError* error) {
 
             case NUMBER:
                 if (result.ptype != INSTRUCT) {
-                    *error = INVALID_ARGUMENT;
+                    *error = INVALID_ARGUMENT; 
                     return (ParsedIns){};
                 }
                 char* endptr;

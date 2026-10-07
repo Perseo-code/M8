@@ -5,8 +5,7 @@ Encoded encoder(ParsedIns ins, Assembler* assm) {
     result.data = malloc(sizeof(uint8_t));
     if (ins.ptype == DIRECT) {
         handleDirective(ins, assm, &result);
-    } else if (ins.ptype == LAB) {
-        
+        return result;
     } else {
         result.data[0] = ins.data.op->code;
     }
