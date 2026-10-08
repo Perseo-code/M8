@@ -5,7 +5,7 @@
 uint64_t parser_position = 0;
 Label* all_labels;
 size_t amount_labels = 1;
-ParsedIns parse(ParsingError* error) {
+ParsedIns parse(ParsingError* error, Assembler* assm) {
     ParsedIns result = {
         .ope1.type = NONE,
         .ope2.type = NONE,
@@ -97,14 +97,16 @@ ParsedIns parse(ParsingError* error) {
                 }
 
                 result.data.label = malloc(sizeof(Label));
+                result.data.label->name_size = strlen(list[parser_position].literal);
+                result.data.label->name = malloc(result.data.label->name_size * sizeof(char));
+                result.data.label->offset = assm->position; 
                 result.ptype = LAB;
                 strcpy(result.data.label->name, list[parser_position].literal);
-                result.data.label->name_size = strlen(result.data.label->name);
                 if (result.data.label->name_size == 0) {
                     *error = LABEL_HAS_NO_NAME;
                     return (ParsedIns){};
                 }
-                Label* temp = realloc(all_labels, amount_labels);
+                Label* temp = realloc(all_labels, sizeof(Label) * amount_labels);
                 if (temp == NULL) {
                     *error = OUT_OF_MEMORY;
                     free(temp);
@@ -112,10 +114,9 @@ ParsedIns parse(ParsingError* error) {
                 }
                 all_labels = temp;
                 amount_labels++;
-                all_labels->index = amount_labels;
                 break;
             case IDENTIFIER:
-                if (result.ptype != NON) {
+                if (result.ptype != INSTRUCT) {
                     *error = TOO_MANY_OPERANDS;
                     return (ParsedIns){};
                 }

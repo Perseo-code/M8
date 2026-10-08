@@ -36,14 +36,13 @@ typedef enum ParseType {
     NON,
     DIRECT,
     INSTRUCT,
-    LAB,
     ID
 } ParseType;
 
 typedef struct Label {
     char* name;
     size_t name_size;
-    uint16_t address;
+    uint16_t offset;
     uintptr_t index;
 } Label;
 

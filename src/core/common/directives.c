@@ -16,32 +16,32 @@ void dataHeader(Assembler* assm, ParsedIns* p) {assm->sect = DATA;}
 void bssHeader(Assembler* assm, ParsedIns* p) {assm->sect = BSS;}
 void textHeader(Assembler* assm, ParsedIns* p) {assm->sect = TEXT;}
 void defbyte(Assembler* assm, ParsedIns* p) {
-    assm->output[assm->position++] = p->ope1.value;
+    assm->output[assm->position++] = p->ope1.val.value;
     assm->output_size++;
 }
 void equ(Assembler* assm, ParsedIns* p) {
-    assm->output[assm->position++] = p->ope1.value;
+    assm->output[assm->position++] = p->ope1.val.value;
     assm->output_size++;
 }
 void org(Assembler* assm, ParsedIns* p) {
-    if (assm->output + p->ope1.value == NULL) {
-        uint8_t* temp = realloc(assm->output, sizeof(uint8_t) * p->ope1.value);
+    if (assm->output + p->ope1.val.value == NULL) {
+        uint8_t* temp = realloc(assm->output, sizeof(uint8_t) * p->ope1.val.value);
         if (temp == NULL) {
             free(temp);
             return;
         }
 
         assm->output = temp;
-        assm->output_size = p->ope1.value;
-        assm->position = p->ope1.value;
+        assm->output_size = p->ope1.val.value;
+        assm->position = p->ope1.val.value;
         allocateNew(assm);
     }
-    assm->position = p->ope1.value;
+    assm->position = p->ope1.val.value;
 }
 
 void resb(Assembler* assm, ParsedIns* p) {
     int i = 0;
-    for (; i < p->ope1.value; i++) {
+    for (; i < p->ope1.val.value; i++) {
         assm->output[assm->position + i] = 0;
     }
     assm->position += i;

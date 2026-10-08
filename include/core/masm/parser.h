@@ -5,7 +5,8 @@
 #include "structures.h"
 #include "directives.h"
 #include "lexer.h"
-ParsedIns parse(ParsingError*); 
+#include "assembler.h"
+ParsedIns parse(ParsingError*, Assembler*); 
 
 extern uint64_t parser_position;
 #endif
